@@ -1,4 +1,4 @@
-package repositories
+package persistence
 
 import (
 	"database/sql"
@@ -8,7 +8,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-func createConnection() *sql.DB {
+func CreateConnection() *sql.DB {
 	var db *sql.DB
 
 	cfg := mysql.Config{

@@ -5,13 +5,18 @@ import (
 	"task_api/src/models"
 )
 
-type TaskRepository struct{}
+type TaskRepository struct {
+	db *sql.DB
+}
+
+func NewTaskRepository(db *sql.DB) *TaskRepository {
+	return &TaskRepository{db: db}
+}
 
 func (t *TaskRepository) FindAll() ([]models.Task, error) {
-	db := createConnection()
 	tasks := make([]models.Task, 0)
 
-	rows, err := db.Query("SELECT * FROM task")
+	rows, err := t.db.Query("SELECT * FROM task")
 
 	if err != nil {
 		return nil, err
@@ -37,9 +42,7 @@ func (t *TaskRepository) FindAll() ([]models.Task, error) {
 }
 
 func (t *TaskRepository) FindById(id int64) (*models.Task, error) {
-	db := createConnection()
-
-	row := db.QueryRow("SELECT * FROM task WHERE id = ?", id)
+	row := t.db.QueryRow("SELECT * FROM task WHERE id = ?", id)
 
 	var task models.Task
 
@@ -51,15 +54,13 @@ func (t *TaskRepository) FindById(id int64) (*models.Task, error) {
 }
 
 func (t *TaskRepository) Save(task models.Task) (*models.Task, error) {
-	db := createConnection()
-
 	var res sql.Result
 	var err error
 
 	if task.Id != 0 {
-		res, err = db.Exec("UPDATE task SET name = ?, finished = ? WHERE id = ?", task.Name, task.Finished, task.Id)
+		res, err = t.db.Exec("UPDATE task SET name = ?, finished = ? WHERE id = ?", task.Name, task.Finished, task.Id)
 	} else {
-		res, err = db.Exec("INSERT INTO task (name, finished) VALUES (?, ?)", task.Name, task.Finished)
+		res, err = t.db.Exec("INSERT INTO task (name, finished) VALUES (?, ?)", task.Name, task.Finished)
 	}
 
 	if err != nil {
@@ -80,9 +81,7 @@ func (t *TaskRepository) Save(task models.Task) (*models.Task, error) {
 }
 
 func (t *TaskRepository) DeleteById(id int64) error {
-	db := createConnection()
-
-	_, err := db.Exec("DELETE FROM task WHERE id = ?", id)
+	_, err := t.db.Exec("DELETE FROM task WHERE id = ?", id)
 
 	return err
 }

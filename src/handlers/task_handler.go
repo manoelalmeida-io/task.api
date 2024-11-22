@@ -10,10 +10,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var taskRepository repositories.TaskRepository
+type TaskHandler struct {
+	taskRepository *repositories.TaskRepository
+}
 
-func GetTasksHandler(c echo.Context) error {
-	tasks, err := taskRepository.FindAll()
+func NewTaskHandler(taskRepository *repositories.TaskRepository) *TaskHandler {
+	return &TaskHandler{taskRepository: taskRepository}
+}
+
+func (h *TaskHandler) GetTasksHandler(c echo.Context) error {
+	tasks, err := h.taskRepository.FindAll()
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -22,7 +28,7 @@ func GetTasksHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, tasks)
 }
 
-func GetTaskByIdHandler(c echo.Context) error {
+func (h *TaskHandler) GetTaskByIdHandler(c echo.Context) error {
 	strIndex := c.Param("id")
 
 	id, err := strconv.Atoi(strIndex)
@@ -31,7 +37,7 @@ func GetTaskByIdHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	task, err := taskRepository.FindById(int64(id))
+	task, err := h.taskRepository.FindById(int64(id))
 
 	if err == sql.ErrNoRows {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -44,14 +50,14 @@ func GetTaskByIdHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, task)
 }
 
-func CreateTaskHandler(c echo.Context) error {
+func (h *TaskHandler) CreateTaskHandler(c echo.Context) error {
 	task := new(models.Task)
 
 	if err := c.Bind(task); err != nil {
 		return err
 	}
 
-	task, err := taskRepository.Save(*task)
+	task, err := h.taskRepository.Save(*task)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -60,7 +66,7 @@ func CreateTaskHandler(c echo.Context) error {
 	return c.JSON(http.StatusCreated, task)
 }
 
-func UpdateTaskHandler(c echo.Context) error {
+func (h *TaskHandler) UpdateTaskHandler(c echo.Context) error {
 	strIndex := c.Param("id")
 
 	id, err := strconv.Atoi(strIndex)
@@ -69,7 +75,7 @@ func UpdateTaskHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	task, err := taskRepository.FindById(int64(id))
+	task, err := h.taskRepository.FindById(int64(id))
 
 	if err == sql.ErrNoRows {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -87,7 +93,7 @@ func UpdateTaskHandler(c echo.Context) error {
 
 	task.Name = requestTask.Name
 
-	updatedTask, err := taskRepository.Save(*task)
+	updatedTask, err := h.taskRepository.Save(*task)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -96,7 +102,7 @@ func UpdateTaskHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, updatedTask)
 }
 
-func ToggleTaskHandler(c echo.Context) error {
+func (h *TaskHandler) ToggleTaskHandler(c echo.Context) error {
 	strIndex := c.Param("id")
 
 	id, err := strconv.Atoi(strIndex)
@@ -105,7 +111,7 @@ func ToggleTaskHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	task, err := taskRepository.FindById(int64(id))
+	task, err := h.taskRepository.FindById(int64(id))
 
 	if err == sql.ErrNoRows {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -117,7 +123,7 @@ func ToggleTaskHandler(c echo.Context) error {
 
 	task.Finished = !task.Finished
 
-	updatedTask, err := taskRepository.Save(*task)
+	updatedTask, err := h.taskRepository.Save(*task)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -126,7 +132,7 @@ func ToggleTaskHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, updatedTask)
 }
 
-func DeleteTaskByIdHandler(c echo.Context) error {
+func (h *TaskHandler) DeleteTaskByIdHandler(c echo.Context) error {
 	strIndex := c.Param("id")
 
 	id, err := strconv.Atoi(strIndex)
@@ -135,13 +141,13 @@ func DeleteTaskByIdHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Parameter id cannot be converted to integer")
 	}
 
-	_, err = taskRepository.FindById(int64(id))
+	_, err = h.taskRepository.FindById(int64(id))
 
 	if err == sql.ErrNoRows {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
-	if err = taskRepository.DeleteById(int64(id)); err != nil {
+	if err = h.taskRepository.DeleteById(int64(id)); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
