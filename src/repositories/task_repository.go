@@ -1,15 +1,15 @@
-package data
+package repositories
 
 import (
 	"database/sql"
-	"task_api/src/domain"
+	"task_api/src/models"
 )
 
 type TaskRepository struct{}
 
-func (t *TaskRepository) FindAll() ([]domain.Task, error) {
+func (t *TaskRepository) FindAll() ([]models.Task, error) {
 	db := createConnection()
-	tasks := make([]domain.Task, 0)
+	tasks := make([]models.Task, 0)
 
 	rows, err := db.Query("SELECT * FROM task")
 
@@ -20,7 +20,7 @@ func (t *TaskRepository) FindAll() ([]domain.Task, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var task domain.Task
+		var task models.Task
 
 		if err := rows.Scan(&task.Id, &task.Name, &task.Finished); err != nil {
 			return nil, err
@@ -36,12 +36,12 @@ func (t *TaskRepository) FindAll() ([]domain.Task, error) {
 	return tasks, nil
 }
 
-func (t *TaskRepository) FindById(id int64) (*domain.Task, error) {
+func (t *TaskRepository) FindById(id int64) (*models.Task, error) {
 	db := createConnection()
 
 	row := db.QueryRow("SELECT * FROM task WHERE id = ?", id)
 
-	var task domain.Task
+	var task models.Task
 
 	if err := row.Scan(&task.Id, &task.Name, &task.Finished); err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (t *TaskRepository) FindById(id int64) (*domain.Task, error) {
 	return &task, nil
 }
 
-func (t *TaskRepository) Save(task domain.Task) (*domain.Task, error) {
+func (t *TaskRepository) Save(task models.Task) (*models.Task, error) {
 	db := createConnection()
 
 	var res sql.Result

@@ -1,4 +1,4 @@
-package domain
+package models
 
 type Task struct {
 	Id       int64  `json:"id"`
