@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-const ROUTE = "/tasks"
+const TASK_ROUTE = "/tasks"
 
 func main() {
 	e := echo.New()
@@ -19,12 +19,12 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	e.GET(ROUTE, handlers.GetTasksHandler)
-	e.GET(ROUTE+"/:id", handlers.GetTaskByIdHandler)
-	e.POST(ROUTE, handlers.CreateTaskHandler)
-	e.PUT(ROUTE+"/:id", handlers.UpdateTaskHandler)
-	e.PATCH(ROUTE+"/:id/toggle", handlers.ToggleTaskHandler)
-	e.DELETE(ROUTE+"/:id", handlers.DeleteTaskByIdHandler)
+	e.GET(TASK_ROUTE, handlers.GetTasksHandler)
+	e.GET(TASK_ROUTE+"/:id", handlers.GetTaskByIdHandler)
+	e.POST(TASK_ROUTE, handlers.CreateTaskHandler)
+	e.PUT(TASK_ROUTE+"/:id", handlers.UpdateTaskHandler)
+	e.PATCH(TASK_ROUTE+"/:id/toggle", handlers.ToggleTaskHandler)
+	e.DELETE(TASK_ROUTE+"/:id", handlers.DeleteTaskByIdHandler)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
