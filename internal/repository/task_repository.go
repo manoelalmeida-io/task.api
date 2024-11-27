@@ -1,8 +1,8 @@
-package repositories
+package repository
 
 import (
 	"database/sql"
-	"task_api/src/models"
+	"task_api/internal/model"
 )
 
 type TaskRepository struct {
@@ -13,8 +13,8 @@ func NewTaskRepository(db *sql.DB) *TaskRepository {
 	return &TaskRepository{db: db}
 }
 
-func (t *TaskRepository) FindAll() ([]models.Task, error) {
-	tasks := make([]models.Task, 0)
+func (t *TaskRepository) FindAll() ([]model.Task, error) {
+	tasks := make([]model.Task, 0)
 
 	rows, err := t.db.Query("SELECT * FROM task")
 
@@ -25,7 +25,7 @@ func (t *TaskRepository) FindAll() ([]models.Task, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var task models.Task
+		var task model.Task
 
 		if err := rows.Scan(&task.Id, &task.Name, &task.Finished); err != nil {
 			return nil, err
@@ -41,10 +41,10 @@ func (t *TaskRepository) FindAll() ([]models.Task, error) {
 	return tasks, nil
 }
 
-func (t *TaskRepository) FindById(id int64) (*models.Task, error) {
+func (t *TaskRepository) FindById(id int64) (*model.Task, error) {
 	row := t.db.QueryRow("SELECT * FROM task WHERE id = ?", id)
 
-	var task models.Task
+	var task model.Task
 
 	if err := row.Scan(&task.Id, &task.Name, &task.Finished); err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (t *TaskRepository) FindById(id int64) (*models.Task, error) {
 	return &task, nil
 }
 
-func (t *TaskRepository) Save(task models.Task) (*models.Task, error) {
+func (t *TaskRepository) Save(task model.Task) (*model.Task, error) {
 	var res sql.Result
 	var err error
 

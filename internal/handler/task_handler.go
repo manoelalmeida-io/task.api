@@ -1,20 +1,20 @@
-package handlers
+package handler
 
 import (
 	"database/sql"
 	"net/http"
 	"strconv"
-	"task_api/src/models"
-	"task_api/src/repositories"
+	"task_api/internal/model"
+	"task_api/internal/repository"
 
 	"github.com/labstack/echo/v4"
 )
 
 type TaskHandler struct {
-	taskRepository *repositories.TaskRepository
+	taskRepository *repository.TaskRepository
 }
 
-func NewTaskHandler(taskRepository *repositories.TaskRepository) *TaskHandler {
+func NewTaskHandler(taskRepository *repository.TaskRepository) *TaskHandler {
 	return &TaskHandler{taskRepository: taskRepository}
 }
 
@@ -51,7 +51,7 @@ func (h *TaskHandler) GetTaskByIdHandler(c echo.Context) error {
 }
 
 func (h *TaskHandler) CreateTaskHandler(c echo.Context) error {
-	task := new(models.Task)
+	task := new(model.Task)
 
 	if err := c.Bind(task); err != nil {
 		return err
@@ -85,7 +85,7 @@ func (h *TaskHandler) UpdateTaskHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	requestTask := new(models.Task)
+	requestTask := new(model.Task)
 
 	if err := c.Bind(requestTask); err != nil {
 		return err
