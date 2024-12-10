@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -12,11 +13,11 @@ func CreateConnection() *sql.DB {
 	var db *sql.DB
 
 	cfg := mysql.Config{
-		User:   os.Getenv("DBUSER"),
-		Passwd: os.Getenv("DBPASS"),
+		User:   os.Getenv("MYSQL_USER"),
+		Passwd: os.Getenv("MYSQL_PASSWORD"),
 		Net:    "tcp",
-		Addr:   "127.0.0.1:3306",
-		DBName: "task_api",
+		Addr:   fmt.Sprintf("%v:3306", os.Getenv("MYSQL_HOST")),
+		DBName: os.Getenv("MYSQL_DATABASE"),
 	}
 
 	var err error

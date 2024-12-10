@@ -26,7 +26,7 @@ func main() {
 
 	m, err := migrate.New(
 		"file://migrations",
-		fmt.Sprintf("mysql://%v:%v@tcp(localhost:3306)/task_api", os.Getenv("DBUSER"), os.Getenv("DBPASS")),
+		fmt.Sprintf("mysql://%v:%v@tcp(%v:3306)/%v", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_DATABASE")),
 	)
 
 	if err != nil {
