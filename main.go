@@ -30,14 +30,16 @@ func main() {
 	)
 
 	if err != nil {
-		log.Fatalf("Erro ao criar migrate: %v", err)
+		log.Fatalf("Error connecting to database while running migrations: %v", err)
 	}
+
+	log.Print("Running database migrations.")
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatalf("Erro ao aplicar migrações: %v", err)
+		log.Fatalf("An error accuried appling migrations to database: %v", err)
 	}
 
-	log.Println("Migrações aplicadas com sucesso!")
+	log.Println("Migrations applied successfully.")
 
 	e := echo.New()
 	e.Use(middleware.Recover())
